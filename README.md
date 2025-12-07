@@ -1,37 +1,50 @@
-# 🤖 TeleBot Admin Portal
+# 🤖 TeleBot E-Commerce System
 
-A comprehensive admin dashboard for managing the TeleBot e-commerce system. This portal provides a simple and efficient interface for managing categories, products, users, and orders.
+A comprehensive e-commerce platform featuring an admin dashboard and intelligent Telegram shopping bot with AI-powered recommendations and seamless database integration.
 
-## 📋 Features
+## 🌟 Key Features
 
-- **Admin Authentication**: Secure login and session management
-- **Dashboard Analytics**: Real-time statistics and insights
-- **Category Management**: Full CRUD operations for product categories
+### 🎯 Admin Portal
+- **Dashboard Analytics**: Real-time revenue, order status, and product metrics
+- **Category Management**: Full CRUD operations with icons and descriptions
 - **Product Management**: 
   - Create, read, update, and delete products
   - Image upload support
-  - Stock management
+  - Real-time stock management
   - Availability toggle
-- **User Management**: View and manage registered users
+- **User Management**: View and manage customers with Telegram integration
 - **Order Management**: 
-  - View all orders with details
-  - Update order status
+  - View all orders with customer details
+  - Update order status (pending → processing → delivered)
   - Track order history
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+  - Order items breakdown
+- **Discount System**: Create and manage promotional codes
+- **Responsive Design**: Works seamlessly on desktop and mobile
+
+### 🤖 Telegram Shopping Bot (`t.me/nauxgniy_bot`)
+- **Smart Shopping Interface**: Browse products directly in Telegram
+- **AI Emotion Detection**: Responds to user mood with appropriate suggestions
+- **Shopping Cart**: Add items, view cart, seamless checkout
+- **Auto-Save User Info**: Remembers name, address, phone for instant repeat orders
+- **Natural Language**: Understands "show me gifts", "I'm sad", etc.
+- **Real-time Database Sync**: All orders appear instantly in admin portal
+- **Order Tracking**: View purchase history in chat
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- MongoDB (v4.4 or higher)
-- npm or yarn
+- Node.js (v20 or higher)
+- MySQL (v8.0 or higher)
+- PM2 (for production deployment)
+- Telegram Bot Token (from @BotFather)
 
 ### Installation
 
-1. **Clone or navigate to the project directory:**
+1. **Clone the repository:**
    ```bash
-   cd "c:\Year 3\FYP\telebot\admin-portal"
+   git clone https://github.com/YingXuan-RP/yx.git
+   cd yx
    ```
 
 2. **Install dependencies:**
@@ -41,63 +54,67 @@ A comprehensive admin dashboard for managing the TeleBot e-commerce system. This
 
 3. **Configure environment variables:**
    ```bash
-   Copy-Item .env.example .env
+   cp .env.example .env
    ```
 
 4. **Edit the `.env` file with your settings:**
    ```env
-   PORT=3000
-   MONGODB_URI=mongodb://localhost:27017/telebot_admin
-   SESSION_SECRET=your-secret-key-here
-   DEFAULT_ADMIN_EMAIL=admin@telebot.com
-   DEFAULT_ADMIN_PASSWORD=admin123
+   PORT=3001
+   MYSQL_HOST=localhost
+   MYSQL_PORT=3306
+   MYSQL_USER=root
+   MYSQL_PASSWORD=your_password_here
+   MYSQL_DATABASE=yx
+   SESSION_SECRET=your-secret-key-change-this
+   TELEGRAM_BOT_TOKEN=your_telegram_bot_token
    ```
 
-5. **Ensure MongoDB is running:**
+5. **Set up the MySQL database:**
+   - Create database: `CREATE DATABASE yx;`
+   - Import initial data: Execute `db/telebot.sql` in MySQL Workbench
+   - Run migration: Execute `db/migrate-to-admin.sql` to add admin portal features
+
+6. **Start with PM2 (Recommended for Production):**
    ```bash
-   # Windows (if MongoDB is installed as a service)
-   net start MongoDB
+   npm install -g pm2
+   npm run pm2:start
    ```
 
-6. **Start the server:**
+   Or manually:
    ```bash
-   npm start
+   npm start              # Admin portal
+   npm run bot            # Telegram bot
    ```
 
-   For development with auto-restart:
-   ```bash
-   npm run dev
-   ```
-
-7. **Access the portal:**
-   - Open your browser and navigate to: `http://localhost:3000`
-   - Login with default credentials:
-     - Email: `admin@telebot.com`
-     - Password: `admin123`
+7. **Access the system:**
+   - **Admin Portal**: http://localhost:3001/dashboard
+   - **Telegram Bot**: https://t.me/nauxgniy_bot
+   - Login with: `boss@happybuy.com` or `admins@gmail.com`
 
 ## 📁 Project Structure
 
 ```
-admin-portal/
-├── config/
-│   └── database.js          # MongoDB connection
-├── middleware/
-│   ├── auth.js              # Authentication middleware
-│   └── upload.js            # File upload configuration
-├── models/
-│   ├── Admin.js             # Admin user model
-│   ├── Category.js          # Category model
-│   ├── Product.js           # Product model
-│   ├── User.js              # User model
-│   └── Order.js             # Order model
-├── routes/
-│   ├── auth.js              # Authentication routes
-│   ├── categories.js        # Category CRUD routes
-│   ├── products.js          # Product CRUD routes
-│   ├── users.js             # User management routes
-│   ├── orders.js            # Order management routes
-│   └── dashboard.js         # Dashboard analytics
+telebot/
+├── database/
+│   └── db.js                # MySQL connection pool
+├── db/
+│   ├── telebot.sql          # Initial database structure
+│   └── migrate-to-admin.sql # Admin portal migration
 ├── public/
+│   ├── css/                 # Stylesheets
+│   ├── js/                  # Client-side JavaScript
+│   └── images/              # Static images
+├── views/
+│   ├── dashboard.html       # Admin dashboard
+│   ├── categories.html      # Category management
+│   ├── products.html        # Product management
+│   ├── orders.html          # Order management
+│   └── login.html           # Authentication
+├── server.js                # Main Express server
+├── telegram-bot.js          # Telegram bot with AI features
+├── ecosystem.config.js      # PM2 configuration
+├── .env                     # Environment variables
+└── package.json             # Dependencies
 │   ├── css/
 │   │   └── style.css        # Main stylesheet
 │   ├── js/
@@ -231,47 +248,81 @@ admin-portal/
 - Verify MongoDB is accessible on the specified port
 
 ### Port Already in Use
-- Change the `PORT` in `.env` to a different value
-- Or stop the process using the port
-
-### Image Upload Issues
-- Check that the `uploads` directory exists
-- Ensure proper file permissions
-- Verify file size limits (max 5MB)
-
-## 🔄 Development
-
-To run in development mode with auto-restart:
 ```bash
-npm run dev
+# Kill process on port 3001
+Get-Process -Id (Get-NetTCPConnection -LocalPort 3001).OwningProcess | Stop-Process
 ```
 
-This uses nodemon to automatically restart the server when files change.
+### Database Connection Issues
+- Verify MySQL is running
+- Check credentials in `.env`
+- Ensure database `yx` exists
+- Run migration scripts
 
-## 📦 Deployment
+## 🤖 Telegram Bot Features
 
-### Production Setup
-1. Set `NODE_ENV=production` in your environment
-2. Use a strong `SESSION_SECRET`
-3. Change default admin credentials
-4. Use a production MongoDB instance
-5. Set up proper logging
-6. Configure HTTPS
-7. Set up reverse proxy (nginx/Apache)
+See [TELEGRAM_BOT_FEATURES.md](TELEGRAM_BOT_FEATURES.md) for complete documentation.
 
-### Recommended Production Configuration
-```env
-NODE_ENV=production
-PORT=3000
-MONGODB_URI=mongodb://your-production-db:27017/telebot_admin
-SESSION_SECRET=your-very-secure-random-string
+**Key Capabilities:**
+- 🛍️ Smart shopping interface with inline keyboards
+- 🤖 AI emotion detection and personalized responses
+- 🧺 Shopping cart with instant checkout
+- 💾 Auto-saves user information (no repeated forms!)
+- 📦 Order tracking and history
+- 🔄 Real-time database synchronization with admin portal
+
+**Try it:** https://t.me/nauxgniy_bot
+
+## 📊 Database Schema
+
+**Main Tables:**
+- `users` - Customer accounts with telegram_id
+- `categories` - Product categories with icons
+- `products` - Inventory with stock tracking
+- `orders` - Customer orders with status
+- `order_items` - Order line items
+- `discounts` - Promotional codes
+
+## 🎓 FYP Highlights
+
+This project demonstrates:
+- ✅ Full-stack web application (Node.js + MySQL)
+- ✅ Telegram Bot API integration
+- ✅ AI/ML features (NLP, emotion detection)
+- ✅ Real-time data synchronization
+- ✅ RESTful API design
+- ✅ Session management and authentication
+- ✅ Process management with PM2
+- ✅ Git version control
+
+## 📦 PM2 Commands
+
+```bash
+pm2 status                    # Check status
+pm2 logs                      # View all logs
+pm2 logs telebot-admin        # Admin portal logs
+pm2 logs telebot-telegram     # Bot logs
+pm2 restart all               # Restart all
+pm2 stop all                  # Stop all
+pm2 delete all                # Remove all
 ```
 
 ## 📄 License
 
-This project is part of the TeleBot e-commerce system.
+Educational project for FYP - Republic Polytechnic
 
-## 👨‍💻 Support
+## 👨‍💻 Developer
+
+**YingXuan**  
+GitHub: [@YingXuan-RP](https://github.com/YingXuan-RP)  
+Bot: https://t.me/nauxgniy_bot
+
+## 🙏 Acknowledgments
+
+- Node.js & Express.js
+- MySQL Database
+- Telegram Bot API
+- PM2 Process Manager
 
 For issues or questions, please contact the development team.
 
