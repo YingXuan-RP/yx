@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TeleBot Admin Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>🤖 TeleBot Admin</h1>
+                <p>Admin Portal Login</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="admin@telebot.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+                
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span class="btn-text">Login</span>
+                    <span class="btn-loader" style="display: none;">🔄 Logging in...</span>
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p>Default credentials: admin@telebot.com / admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/login.js"></script>
+</body>
+</html>

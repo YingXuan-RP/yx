@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - TeleBot Admin Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🤖 TeleBot Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="/categories" class="nav-item active">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">Categories</span>
+                </a>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">🛍️</span>
+                            <span class="nav-text">Products</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/products" class="nav-item">All Products</a>
+                        <a href="/inventory" class="nav-item">Inventory</a>
+                        <a href="/purchase-orders" class="nav-item">Purchase Orders</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-text">Customers</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/users" class="nav-item">All Customers</a>
+                        <a href="/segments" class="nav-item">Segments</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">📦</span>
+                            <span class="nav-text">Orders</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/orders" class="nav-item">All Orders</a>
+                        <a href="/abandoned-checkouts" class="nav-item">Abandoned Checkouts</a>
+                    </div>
+                </div>
+                <a href="/discounts" class="nav-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Discounts</span>
+                </a>
+                <a href="/analytics" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="/liveview" class="nav-item">
+                    <span class="nav-icon">🔴</span>
+                    <span class="nav-text">Live View</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-secondary btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Categories</h1>
+                <div class="header-actions">
+                    <div class="notification-icon" id="notificationBell">
+                        <span class="bell">🔔</span>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </div>
+                    <button id="addCategoryBtn" class="btn btn-primary">+ Add Category</button>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="search-container" style="margin-bottom: 20px;">
+                    <input type="text" id="searchCategories" placeholder="🔍 Search categories..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Icon</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoriesTable">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination -->
+                    <div class="pagination-container" id="paginationContainer">
+                        <div class="pagination" id="pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Category Modal -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Category</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="categoryForm">
+                <input type="hidden" id="categoryId">
+                <div class="form-group">
+                    <label for="categoryName">Name *</label>
+                    <input type="text" id="categoryName" required>
+                </div>
+                <div class="form-group">
+                    <label for="categoryDescription">Description</label>
+                    <textarea id="categoryDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="categoryIcon">Icon</label>
+                    <input type="text" id="categoryIcon" placeholder="📦">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="categoryActive" checked>
+                        Active
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/categories.js"></script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory - TeleBot Admin Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🤖 TeleBot Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="/categories" class="nav-item">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">Categories</span>
+                </a>
+                <div class="nav-dropdown open">
+                    <button class="nav-dropdown-toggle active">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">🛍️</span>
+                            <span class="nav-text">Products</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/products" class="nav-item">All Products</a>
+                        <a href="/inventory" class="nav-item active">Inventory</a>
+                        <a href="/purchase-orders" class="nav-item">Purchase Orders</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-text">Customers</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/users" class="nav-item">All Customers</a>
+                        <a href="/segments" class="nav-item">Segments</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">📦</span>
+                            <span class="nav-text">Orders</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/orders" class="nav-item">All Orders</a>
+                        <a href="/abandoned-checkouts" class="nav-item">Abandoned Checkouts</a>
+                    </div>
+                </div>
+                <a href="/discounts" class="nav-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Discounts</span>
+                </a>
+                <a href="/analytics" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="/liveview" class="nav-item">
+                    <span class="nav-icon">🔴</span>
+                    <span class="nav-text">Live View</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-secondary btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>🏪 Inventory</h1>
+                <div class="notification-icon" id="notificationBell">
+                    <span class="bell">🔔</span>
+                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Inventory Stats -->
+                <div class="inventory-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Total Products</div>
+                            <div class="stat-value" id="totalProducts">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-label">In Stock</div>
+                            <div class="stat-value" id="inStock">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card alert">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Low Stock</div>
+                            <div class="stat-value" id="lowStock">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Out of Stock</div>
+                            <div class="stat-value" id="outOfStock">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State or Inventory View Toggle -->
+                <div id="emptyState" style="display: none;">
+                    <div class="empty-state-container">
+                        <div class="empty-state-icon">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect x='30' y='40' width='60' height='50' fill='%236b4423' rx='5'/%3E%3Cpath d='M30 50 L60 35 L90 50' fill='%238b6f47' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='60' cy='65' r='8' fill='%23f59e0b'/%3E%3Ctext x='60' y='105' font-size='24' text-anchor='middle' fill='%23666'%3E17%3C/text%3E%3C/svg%3E" alt="Inventory" style="width: 180px; height: 180px;">
+                        </div>
+                        <h2>Keep track of your inventory</h2>
+                        <p>When you enable inventory tracking on your products, you can view<br>and adjust their inventory counts here.</p>
+                        <div style="margin-top: 20px;">
+                            <a href="#" class="text-link">Learn more about managing inventory</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Table -->
+                <div id="inventoryView">
+                    <!-- Search and Filter Bar -->
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search inventory...">
+                        <select id="stockFilter" class="filter-select">
+                            <option value="all">All Stock Levels</option>
+                            <option value="in-stock">In Stock</option>
+                            <option value="low-stock">Low Stock (≤10)</option>
+                            <option value="out-of-stock">Out of Stock</option>
+                        </select>
+                        <button id="exportBtn" class="btn btn-secondary">📥 Export</button>
+                    </div>
+
+                    <!-- Inventory Table -->
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>SKU</th>
+                                    <th>Category</th>
+                                    <th>Stock Quantity</th>
+                                    <th>Status</th>
+                                    <th>Price</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <button id="prevBtn" class="pagination-btn" disabled>← Previous</button>
+                        <div class="page-numbers" id="pageNumbers"></div>
+                        <button id="nextBtn" class="pagination-btn" disabled>Next →</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Update Stock Modal -->
+    <div id="stockModal" class="modal" style="display: none;">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Update Stock</h2>
+                <button class="modal-close" onclick="closeStockModal()">&times;</button>
+            </div>
+            <form id="stockForm">
+                <div class="stock-product-info">
+                    <strong id="stockProductName"></strong>
+                    <p>Current Stock: <span id="currentStock">0</span></p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stockAction">Action *</label>
+                    <select id="stockAction" required onchange="updateStockCalculation()">
+                        <option value="">Select Action</option>
+                        <option value="set">Set to specific amount</option>
+                        <option value="add">Add stock (receive)</option>
+                        <option value="remove">Remove stock (damage/loss)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="stockQuantity">Quantity *</label>
+                    <input type="number" id="stockQuantity" required min="0" placeholder="Enter quantity" onchange="updateStockCalculation()">
+                </div>
+
+                <div class="stock-calculation" id="stockCalculation" style="display: none;">
+                    <p>New Stock: <strong id="newStockAmount">0</strong></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="stockReason">Reason (optional)</label>
+                    <textarea id="stockReason" placeholder="Enter reason for stock adjustment" rows="3"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeStockModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Stock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/inventory.js"></script>
+</body>
+</html>

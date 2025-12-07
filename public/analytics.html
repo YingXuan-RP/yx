@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - TeleBot Admin Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🤖 TeleBot Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="/categories" class="nav-item">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">Categories</span>
+                </a>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">🛍️</span>
+                            <span class="nav-text">Products</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/products" class="nav-item">All Products</a>
+                        <a href="/inventory" class="nav-item">Inventory</a>
+                        <a href="/purchase-orders" class="nav-item">Purchase Orders</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-text">Customers</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/users" class="nav-item">All Customers</a>
+                        <a href="/segments" class="nav-item">Segments</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">📦</span>
+                            <span class="nav-text">Orders</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/orders" class="nav-item">All Orders</a>
+                        <a href="/abandoned-checkouts" class="nav-item">Abandoned Checkouts</a>
+                    </div>
+                </div>
+                <a href="/discounts" class="nav-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Discounts</span>
+                </a>
+                <a href="/analytics" class="nav-item active">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-secondary btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Analytics</h1>
+                <div class="notification-icon" id="notificationBell">
+                    <span class="bell">🔔</span>
+                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Date Filter -->
+                <div class="analytics-filters">
+                    <div class="filter-group">
+                        <label>Time Period:</label>
+                        <select id="timePeriod" class="filter-select">
+                            <option value="7">Last 7 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                            <option value="365">Last year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Top Stats Overview -->
+                <div class="analytics-stats-grid">
+                    <div class="analytics-stat-card">
+                        <div class="stat-label">Gross Sales</div>
+                        <div class="stat-value" id="analyticsRevenue">SGD 0</div>
+                    </div>
+                    <div class="analytics-stat-card">
+                        <div class="stat-label">Returning Customer Rate</div>
+                        <div class="stat-value" id="returningRate">0%</div>
+                    </div>
+                    <div class="analytics-stat-card">
+                        <div class="stat-label">Orders Fulfilled</div>
+                        <div class="stat-value" id="ordersFulfilled">0</div>
+                    </div>
+                    <div class="analytics-stat-card">
+                        <div class="stat-label">Orders</div>
+                        <div class="stat-value" id="analyticsTotalOrders">0</div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="analytics-grid">
+                    <!-- Total Sales Over Time -->
+                    <div class="analytics-card card-wide">
+                        <h3>Total sales over time</h3>
+                        <div class="chart-container">
+                            <canvas id="salesOverTimeChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Total Sales Breakdown -->
+                    <div class="analytics-card">
+                        <h3>Total sales breakdown</h3>
+                        <div class="breakdown-list">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Gross sales</span>
+                                <span class="breakdown-value" id="breakdownGross">SGD 0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Discounts</span>
+                                <span class="breakdown-value" id="breakdownDiscounts">SGD 0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Returns</span>
+                                <span class="breakdown-value" id="breakdownReturns">SGD 0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Net sales</span>
+                                <span class="breakdown-value" id="breakdownNet">SGD 0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Shipping charges</span>
+                                <span class="breakdown-value" id="breakdownShipping">SGD 0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Return fees</span>
+                                <span class="breakdown-value" id="breakdownReturnFees">SGD 0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Taxes</span>
+                                <span class="breakdown-value" id="breakdownTaxes">SGD 0.00</span>
+                            </div>
+                            <div class="breakdown-item total">
+                                <span class="breakdown-label">Total sales</span>
+                                <span class="breakdown-value" id="breakdownTotal">SGD 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Sales by Sales Channel -->
+                    <div class="analytics-card">
+                        <h3>Total sales by sales channel</h3>
+                        <div class="chart-container">
+                            <canvas id="channelChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Average Order Value Over Time -->
+                    <div class="analytics-card">
+                        <h3>Average order value over time</h3>
+                        <div class="chart-container">
+                            <canvas id="avgOrderValueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Total Sales by Product -->
+                    <div class="analytics-card">
+                        <h3>Total sales by product</h3>
+                        <div class="chart-container">
+                            <canvas id="productSalesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Sessions Over Time -->
+                    <div class="analytics-card">
+                        <h3>Sessions over time</h3>
+                        <div class="chart-container">
+                            <canvas id="sessionsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Conversion Rate Over Time -->
+                    <div class="analytics-card">
+                        <h3>Conversion rate over time</h3>
+                        <div class="chart-container">
+                            <canvas id="conversionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Conversion Rate Breakdown -->
+                    <div class="analytics-card">
+                        <h3>Conversion rate breakdown</h3>
+                        <div class="conversion-breakdown">
+                            <div class="conversion-item">
+                                <span class="conversion-label">Sessions</span>
+                                <div class="conversion-stats">
+                                    <span class="conversion-stat">0%</span>
+                                    <span class="conversion-number">0</span>
+                                </div>
+                            </div>
+                            <div class="conversion-item">
+                                <span class="conversion-label">Added to cart</span>
+                                <div class="conversion-stats">
+                                    <span class="conversion-stat">0%</span>
+                                    <span class="conversion-number">0</span>
+                                </div>
+                            </div>
+                            <div class="conversion-item">
+                                <span class="conversion-label">Reached checkout</span>
+                                <div class="conversion-stats">
+                                    <span class="conversion-stat">0%</span>
+                                    <span class="conversion-number">0</span>
+                                </div>
+                            </div>
+                            <div class="conversion-item">
+                                <span class="conversion-label">Completed</span>
+                                <div class="conversion-stats">
+                                    <span class="conversion-stat">0%</span>
+                                    <span class="conversion-number">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sessions by Device Type -->
+                    <div class="analytics-card">
+                        <h3>Sessions by device type</h3>
+                        <div class="chart-container">
+                            <canvas id="deviceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Sessions by Location -->
+                    <div class="analytics-card">
+                        <h3>Sessions by location</h3>
+                        <div class="chart-container">
+                            <canvas id="locationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Total Sales by Social Referrer -->
+                    <div class="analytics-card">
+                        <h3>Total sales by social referrer</h3>
+                        <div class="chart-container">
+                            <canvas id="socialChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Analytics Grid -->
+                <div class="analytics-grid-3">
+                    <!-- Sessions by Referrer -->
+                    <div class="analytics-card">
+                        <h3>Sessions by referrer</h3>
+                        <div class="analytics-subtitle">Direct · None · Council Bluffs</div>
+                        <div class="chart-container">
+                            <canvas id="referrerChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Total Sales by POS Location -->
+                    <div class="analytics-card">
+                        <h3>Total sales by POS location</h3>
+                        <div class="no-data-message">
+                            <p>No data for this date range</p>
+                        </div>
+                    </div>
+
+                    <!-- Products by Sell-through Rate -->
+                    <div class="analytics-card">
+                        <h3>Products by sell-through rate</h3>
+                        <div class="analytics-subtitle">shirt · Default Title · None</div>
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="sellThroughChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POS Staff Sales Total -->
+                <div class="analytics-card" style="margin-top: 20px;">
+                    <h3>POS staff sales total</h3>
+                    <div class="no-data-message">
+                        <p>No data for this date range</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/analytics.js"></script>
+</body>
+</html>

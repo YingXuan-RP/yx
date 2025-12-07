@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segments - TeleBot Admin Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🤖 TeleBot Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="/categories" class="nav-item">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">Categories</span>
+                </a>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">🛍️</span>
+                            <span class="nav-text">Products</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/products" class="nav-item">All Products</a>
+                        <a href="/inventory" class="nav-item">Inventory</a>
+                        <a href="/purchase-orders" class="nav-item">Purchase Orders</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown open">
+                    <button class="nav-dropdown-toggle active">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-text">Customers</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/users" class="nav-item">All Customers</a>
+                        <a href="/segments" class="nav-item active">Segments</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">📦</span>
+                            <span class="nav-text">Orders</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/orders" class="nav-item">All Orders</a>
+                        <a href="/abandoned-checkouts" class="nav-item">Abandoned Checkouts</a>
+                    </div>
+                </div>
+                <a href="/discounts" class="nav-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Discounts</span>
+                </a>
+                <a href="/analytics" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="/liveview" class="nav-item">
+                    <span class="nav-icon">🔴</span>
+                    <span class="nav-text">Live View</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-secondary btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="nav-icon" style="font-size: 24px;">👥</span>
+                    <h1>Customers who have purchased at least once</h1>
+                </div>
+                <div class="notification-icon" id="notificationBell">
+                    <span class="bell">🔔</span>
+                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Segments List View -->
+                <div id="segmentsListView">
+                    <div class="segments-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <input type="text" id="searchSegments" placeholder="🔍 Search segments..." class="search-input" style="flex: 1; max-width: 300px;">
+                        </div>
+                        <button class="btn btn-primary" onclick="createNewSegment()">+ Create segment</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;"><input type="checkbox"></th>
+                                        <th>Name</th>
+                                        <th>% of customers</th>
+                                        <th>Last activity</th>
+                                        <th>Created by</th>
+                                        <th style="width: 50px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="segmentsTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="segments-footer">
+                        <a href="#" class="text-link">Learn more about segments</a>
+                    </div>
+                </div>
+
+                <!-- Segment Detail View -->
+                <div id="segmentDetailView" style="display: none;">
+                    <button class="btn-back" onclick="backToSegmentsList()">← Back to Segments</button>
+                    
+                    <!-- Segment Stats -->
+                    <div class="segment-stats">
+                        <div class="segment-stat-main">
+                            <span class="segment-indicator"></span>
+                            <span class="segment-count" id="detailSegmentCount">0 customers</span>
+                        </div>
+                        <div class="segment-stat-secondary" id="detailSegmentPercentage">0% of your customer base</div>
+                    </div>
+
+                    <!-- Customer List -->
+                    <div class="card" style="margin-top: 30px;">
+                        <div class="segment-table-header">
+                            <h3>Customers in this segment</h3>
+                            <div class="segment-actions">
+                                <button class="btn btn-secondary btn-sm">Export</button>
+                                <button class="btn btn-primary btn-sm">Send email</button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Email Status</th>
+                                        <th>Location</th>
+                                        <th>Orders</th>
+                                        <th>Amount Spent</th>
+                                        <th>Last Order</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="segmentCustomersTable">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/segments.js"></script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - TeleBot Admin Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🤖 TeleBot Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="/categories" class="nav-item">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">Categories</span>
+                </a>
+                <div class="nav-dropdown open">
+                    <button class="nav-dropdown-toggle active">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">🛍️</span>
+                            <span class="nav-text">Products</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/products" class="nav-item active">All Products</a>
+                        <a href="/inventory" class="nav-item">Inventory</a>
+                        <a href="/purchase-orders" class="nav-item">Purchase Orders</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-text">Customers</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/users" class="nav-item">All Customers</a>
+                        <a href="/segments" class="nav-item">Segments</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">📦</span>
+                            <span class="nav-text">Orders</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/orders" class="nav-item">All Orders</a>
+                        <a href="/abandoned-checkouts" class="nav-item">Abandoned Checkouts</a>
+                    </div>
+                </div>
+                <a href="/discounts" class="nav-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Discounts</span>
+                </a>
+                <a href="/analytics" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="/liveview" class="nav-item">
+                    <span class="nav-icon">🔴</span>
+                    <span class="nav-text">Live View</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-secondary btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Products</h1>
+                <div class="header-actions">
+                    <div class="notification-icon" id="notificationBell">
+                        <span class="bell">🔔</span>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </div>
+                    <button id="addProductBtn" class="btn btn-primary">+ Add Product</button>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Products List View -->
+                <div id="productsListView">
+                    <div class="search-container" style="margin-bottom: 20px;">
+                        <input type="text" id="searchProducts" placeholder="🔍 Search products..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+                    </div>
+                    <div class="card">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTable">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Product Form View -->
+                <div id="addProductView" style="display: none;">
+                    <div class="product-form-container">
+                        <div class="product-form-main">
+                            <!-- Title -->
+                            <div class="card">
+                                <div class="form-group">
+                                    <label for="productTitle">Title</label>
+                                    <input type="text" id="productTitle" class="form-control-lg" placeholder="Short sleeve t-shirt">
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="card">
+                                <div class="form-group">
+                                    <label for="productDescription">Description</label>
+                                    <textarea id="productDescription" rows="6" class="form-control-lg" placeholder="Describe your product..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Media -->
+                            <div class="card">
+                                <h3 class="card-title">Media</h3>
+                                <div class="media-upload-container">
+                                    <div class="media-preview" id="mediaPreview" style="display: none;">
+                                        <img id="previewImg" alt="Product image">
+                                        <button type="button" class="remove-media" onclick="removeMedia()">×</button>
+                                    </div>
+                                    <div class="media-upload-box" id="mediaUploadBox">
+                                        <input type="file" id="productImage" accept="image/*" style="display: none;">
+                                        <button type="button" class="add-media-btn" onclick="document.getElementById('productImage').click()">
+                                            <span style="font-size: 32px;">+</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Price -->
+                            <div class="card">
+                                <h3 class="card-title">Price</h3>
+                                <div class="form-group">
+                                    <div class="input-with-prefix">
+                                        <span class="input-prefix">$</span>
+                                        <input type="number" id="productPrice" step="0.01" min="0" placeholder="0.00">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Inventory -->
+                            <div class="card">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                    <h3 class="card-title" style="margin: 0;">Inventory</h3>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="inventoryTracked" checked>
+                                        <span class="toggle-slider"></span>
+                                        <span style="margin-left: 10px; font-size: 14px;">Inventory tracked</span>
+                                    </label>
+                                </div>
+                                <div class="inventory-fields">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Quantity</label>
+                                            <div class="quantity-input-group">
+                                                <span class="quantity-label">Shop location</span>
+                                                <input type="number" id="productStock" min="0" value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="inventory-options">
+                                        <button type="button" class="btn-text">SKU</button>
+                                        <button type="button" class="btn-text">Barcode</button>
+                                        <button type="button" class="btn-text">Sell when out of stock</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Shipping -->
+                            <div class="card">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                    <h3 class="card-title" style="margin: 0;">Shipping</h3>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="physicalProduct" checked>
+                                        <span class="toggle-slider"></span>
+                                        <span style="margin-left: 10px; font-size: 14px;">Physical product</span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Product weight</label>
+                                    <div class="input-with-suffix">
+                                        <input type="number" id="productWeight" step="0.01" min="0" placeholder="0.0">
+                                        <select class="input-suffix">
+                                            <option>kg</option>
+                                            <option>g</option>
+                                            <option>lb</option>
+                                            <option>oz</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar -->
+                        <div class="product-form-sidebar">
+                            <!-- Status -->
+                            <div class="card">
+                                <h3 class="card-title">Status</h3>
+                                <select id="productStatus" class="form-control">
+                                    <option value="active">Active</option>
+                                    <option value="draft">Draft</option>
+                                </select>
+                            </div>
+
+                            <!-- Publishing -->
+                            <div class="card">
+                                <h3 class="card-title">Publishing</h3>
+                                <div class="publishing-options">
+                                    <label class="checkbox-option">
+                                        <input type="checkbox" checked>
+                                        <span>Online Store</span>
+                                    </label>
+                                    <label class="checkbox-option">
+                                        <input type="checkbox">
+                                        <span>Shop</span>
+                                    </label>
+                                    <label class="checkbox-option">
+                                        <input type="checkbox">
+                                        <span>Point of Sale</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Product Organization -->
+                            <div class="card">
+                                <h3 class="card-title">Product organization</h3>
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select id="productCategory" class="form-control">
+                                        <option value="">Select category...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Vendor</label>
+                                    <input type="text" id="productVendor" class="form-control" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tags</label>
+                                    <input type="text" id="productTags" class="form-control" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions-sticky">
+                        <button type="button" class="btn btn-secondary" onclick="cancelAddProduct()">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="saveProduct()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/products.js"></script>
+</body>
+</html>

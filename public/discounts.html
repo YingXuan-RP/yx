@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discounts - TeleBot Admin Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🤖 TeleBot Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="/categories" class="nav-item">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">Categories</span>
+                </a>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">🛍️</span>
+                            <span class="nav-text">Products</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/products" class="nav-item">All Products</a>
+                        <a href="/inventory" class="nav-item">Inventory</a>
+                        <a href="/purchase-orders" class="nav-item">Purchase Orders</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-text">Customers</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/users" class="nav-item">All Customers</a>
+                        <a href="/segments" class="nav-item">Segments</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">📦</span>
+                            <span class="nav-text">Orders</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/orders" class="nav-item">All Orders</a>
+                        <a href="/abandoned-checkouts" class="nav-item">Abandoned Checkouts</a>
+                    </div>
+                </div>
+                <a href="/discounts" class="nav-item active">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Discounts</span>
+                </a>
+                <a href="/analytics" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="/liveview" class="nav-item">
+                    <span class="nav-icon">🔴</span>
+                    <span class="nav-text">Live View</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-secondary btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Discounts & Vouchers</h1>
+                <div class="notification-icon" id="notificationBell">
+                    <span class="bell">🔔</span>
+                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search discounts...">
+                    <button id="createBtn" class="btn btn-primary">+ Create Discount</button>
+                </div>
+
+                <!-- Discounts Table -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Discount Value</th>
+                                <th>Usage Limit</th>
+                                <th>Used</th>
+                                <th>Valid Until</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="discountsTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button id="prevBtn" class="pagination-btn" disabled>← Previous</button>
+                    <div class="page-numbers" id="pageNumbers"></div>
+                    <button id="nextBtn" class="pagination-btn" disabled>Next →</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div id="discountModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Create Discount</h2>
+                <button class="modal-close" onclick="closeDiscountModal()">&times;</button>
+            </div>
+            <form id="discountForm">
+                <div class="form-group">
+                    <label for="discountCode">Discount Code *</label>
+                    <input type="text" id="discountCode" required placeholder="e.g., NEWYEAR2025">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="discountType">Type *</label>
+                        <select id="discountType" required onchange="updateDiscountDisplay()">
+                            <option value="">Select Type</option>
+                            <option value="percentage">Percentage (%)</option>
+                            <option value="fixed">Fixed Amount (SGD)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="discountValue">Discount Value *</label>
+                        <input type="number" id="discountValue" required placeholder="e.g., 10 or 5.00" step="0.01" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="usageLimit">Usage Limit (0 = Unlimited)</label>
+                        <input type="number" id="usageLimit" placeholder="e.g., 100" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="validUntil">Valid Until *</label>
+                        <input type="date" id="validUntil" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="discountCategory">Category</label>
+                        <select id="discountCategory">
+                            <option value="">All Categories</option>
+                            <option value="new_users">New Users</option>
+                            <option value="returning_users">Returning Users</option>
+                            <option value="seasonal">Seasonal</option>
+                            <option value="promotional">Promotional</option>
+                            <option value="bulk">Bulk Order</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="minimumPurchase">Minimum Purchase (SGD)</label>
+                        <input type="number" id="minimumPurchase" placeholder="e.g., 50.00" step="0.01" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="discountDescription">Description</label>
+                    <textarea id="discountDescription" placeholder="e.g., Special offer for new customers" rows="3"></textarea>
+                </div>
+
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="isActive" checked>
+                    <label for="isActive">Active</label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeDiscountModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Discount</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Delete Discount?</h2>
+            </div>
+            <p id="deleteMessage"></p>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/discounts.js"></script>
+</body>
+</html>

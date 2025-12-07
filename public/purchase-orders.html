@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Orders - TeleBot Admin Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🤖 TeleBot Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="/categories" class="nav-item">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">Categories</span>
+                </a>
+                <div class="nav-dropdown open">
+                    <button class="nav-dropdown-toggle active">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">🛍️</span>
+                            <span class="nav-text">Products</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/products" class="nav-item">All Products</a>
+                        <a href="/inventory" class="nav-item">Inventory</a>
+                        <a href="/purchase-orders" class="nav-item active">Purchase Orders</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-text">Customers</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/users" class="nav-item">All Customers</a>
+                        <a href="/segments" class="nav-item">Segments</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-toggle">
+                        <div style="display: flex; align-items: center;">
+                            <span class="nav-icon">📦</span>
+                            <span class="nav-text">Orders</span>
+                        </div>
+                        <span class="dropdown-arrow">▶</span>
+                    </button>
+                    <div class="nav-submenu">
+                        <a href="/orders" class="nav-item">All Orders</a>
+                        <a href="/abandoned-checkouts" class="nav-item">Abandoned Checkouts</a>
+                    </div>
+                </div>
+                <a href="/discounts" class="nav-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Discounts</span>
+                </a>
+                <a href="/analytics" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="/liveview" class="nav-item">
+                    <span class="nav-icon">🔴</span>
+                    <span class="nav-text">Live View</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-secondary btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- List View -->
+            <div id="purchaseOrdersListView">
+                <header class="content-header">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="nav-icon" style="font-size: 24px;">📦</span>
+                        <h1>Purchase orders</h1>
+                    </div>
+                    <div class="notification-icon" id="notificationBell">
+                        <span class="bell">🔔</span>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </div>
+                </header>
+
+                <div class="content-body">
+                    <div class="purchase-orders-header">
+                        <div class="po-status-tabs">
+                            <button class="tab-btn active" onclick="filterByStatus('all')">All</button>
+                            <button class="tab-btn" onclick="filterByStatus('draft')">Draft</button>
+                            <button class="tab-btn" onclick="filterByStatus('ordered')">Ordered</button>
+                            <button class="tab-btn" onclick="filterByStatus('partial')">Partial</button>
+                            <button class="tab-btn" onclick="filterByStatus('received')">Received</button>
+                            <button class="tab-btn" onclick="filterByStatus('closed')">Closed</button>
+                            <button class="tab-btn" onclick="filterByStatus('add')">+</button>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-secondary btn-sm">
+                                <span>🔍</span>
+                            </button>
+                            <button class="btn btn-secondary btn-sm">
+                                <span>☰</span>
+                            </button>
+                            <button class="btn btn-secondary btn-sm">
+                                <span>↕</span>
+                            </button>
+                        </div>
+                        <button class="btn btn-primary" onclick="goToCreateForm()">Create purchase order</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;"><input type="checkbox"></th>
+                                        <th>Purchase order</th>
+                                        <th>Supplier</th>
+                                        <th>Destination</th>
+                                        <th>Status</th>
+                                        <th>Received</th>
+                                        <th>Total</th>
+                                        <th>Expected arrival</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchaseOrdersTableBody">
+                                    <tr>
+                                        <td><input type="checkbox"></td>
+                                        <td>#PO1</td>
+                                        <td></td>
+                                        <td>Shop location</td>
+                                        <td><span class="badge badge-warning">Draft</span></td>
+                                        <td>0 of 0</td>
+                                        <td>$1.01</td>
+                                        <td>Dec 3, 2025</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                        <p>Learn more about purchase orders</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form View -->
+            <div id="purchaseOrdersFormView" style="display: none;">
+                <header class="content-header">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="nav-icon" style="font-size: 24px;">📦</span>
+                        <h1>Create purchase order</h1>
+                    </div>
+                    <div class="notification-icon" id="notificationBell2">
+                        <span class="bell">🔔</span>
+                        <span class="notification-badge" style="display: none;">0</span>
+                    </div>
+                </header>
+
+                <div class="content-body">
+                    <form class="purchase-order-form">
+                        <!-- Supplier & Destination Row -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Supplier</label>
+                                <select class="form-control" id="supplier">
+                                    <option>Select supplier</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Destination</label>
+                                <select class="form-control" id="destination">
+                                    <option>Shop location</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Payment & Currency Row -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Payment terms (optional)</label>
+                                <select class="form-control" id="paymentTerms">
+                                    <option>None</option>
+                                    <option>Payment on receipt</option>
+                                    <option>Net 30</option>
+                                    <option>Net 60</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Supplier currency</label>
+                                <select class="form-control" id="currency">
+                                    <option>Singapore Dollar (SGD $)</option>
+                                    <option>US Dollar (USD $)</option>
+                                    <option>Euro (EUR €)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Shipment Details -->
+                        <div class="form-section">
+                            <h3>Shipment details</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Estimated arrival</label>
+                                    <input type="date" class="form-control" id="estimatedArrival" placeholder="YYYY-MM-DD">
+                                </div>
+                                <div class="form-group">
+                                    <label>Shipping carrier</label>
+                                    <select class="form-control" id="shippingCarrier">
+                                        <option>Amazon</option>
+                                        <option>DHL</option>
+                                        <option>FedEx</option>
+                                        <option>UPS</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tracking number</label>
+                                    <input type="text" class="form-control" id="trackingNumber" placeholder="111">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add Products -->
+                        <div class="form-section">
+                            <h3>Add products</h3>
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 1;">
+                                    <input type="text" class="form-control" placeholder="🔍 Search products">
+                                </div>
+                                <button type="button" class="btn btn-secondary">Browse</button>
+                            </div>
+                        </div>
+
+                        <!-- Products Table -->
+                        <div class="form-section">
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Products</th>
+                                            <th>Supplier SKU</th>
+                                            <th>Quantity</th>
+                                            <th>Cost</th>
+                                            <th>Tax</th>
+                                            <th>Total</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><div style="display: flex; gap: 10px; align-items: center;"><img src="/uploads/lego_star_wars.png" alt="shirt" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;"><a href="#">shirt</a></div></td>
+                                            <td><input type="text" class="form-control" style="width: 100%;"></td>
+                                            <td><input type="number" class="form-control" value="1" style="width: 80px;"></td>
+                                            <td><input type="text" class="form-control" value="$ 0.00" style="width: 100px;"></td>
+                                            <td><input type="text" class="form-control" value="0" style="width: 60px;"> <span>%</span></td>
+                                            <td><span style="font-weight: 600;">$0.00</span></td>
+                                            <td><button type="button" class="btn-icon" style="color: #999;">×</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 10px;">1 variant on purchase order</p>
+                        </div>
+
+                        <!-- Additional Details & Cost Summary -->
+                        <div class="form-row" style="gap: 40px;">
+                            <div class="form-group" style="flex: 1;">
+                                <h3 style="margin-bottom: 20px;">Additional details</h3>
+                                
+                                <div style="margin-bottom: 20px;">
+                                    <label>Reference number</label>
+                                    <input type="text" class="form-control">
+                                </div>
+
+                                <div style="margin-bottom: 20px;">
+                                    <label>Note to supplier</label>
+                                    <textarea class="form-control" style="min-height: 100px; resize: vertical;"></textarea>
+                                    <div style="text-align: right; font-size: 12px; color: var(--text-secondary); margin-top: 5px;">0/5000</div>
+                                </div>
+
+                                <div>
+                                    <label>Tags</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="flex: 0 0 350px;">
+                                <h3 style="margin-bottom: 20px;">Cost summary</h3>
+                                <div style="background: var(--card-background); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                                        <span>Taxes (included)</span>
+                                        <span style="font-weight: 600;">$0.00</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+                                        <span>Subtotal</span>
+                                        <span style="font-weight: 600;">$0.00</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; color: var(--text-secondary);">
+                                        <span>0 items</span>
+                                    </div>
+                                    
+                                    <div style="margin-bottom: 12px; margin-top: 20px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                            <span>Cost adjustments</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                            <span>Shipping</span>
+                                            <span>$0.00</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="padding-top: 12px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; font-weight: 600; font-size: 16px;">
+                                        <span>Total</span>
+                                        <span>$0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Form Footer -->
+                    <div class="form-footer">
+                        <button class="btn btn-secondary" onclick="goToListView()">Cancel</button>
+                        <button class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNotificationBadge();
+        });
+
+        function goToCreateForm() {
+            document.getElementById('purchaseOrdersListView').style.display = 'none';
+            document.getElementById('purchaseOrdersFormView').style.display = 'block';
+        }
+
+        function goToListView() {
+            document.getElementById('purchaseOrdersListView').style.display = 'block';
+            document.getElementById('purchaseOrdersFormView').style.display = 'none';
+        }
+
+        function filterByStatus(status) {
+            // Update tab active state
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
