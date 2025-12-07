@@ -178,6 +178,12 @@ CREATE TABLE IF NOT EXISTS `inventory_adjustments` (
   CONSTRAINT `inventory_adjustments_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Add telegram bot columns to users table
+ALTER TABLE `users` 
+ADD COLUMN IF NOT EXISTS `telegram_id` BIGINT DEFAULT NULL UNIQUE,
+ADD COLUMN IF NOT EXISTS `phone_number` VARCHAR(20) DEFAULT NULL,
+ADD COLUMN IF NOT EXISTS `address` TEXT DEFAULT NULL;
+
 -- Update existing data to have proper stock values
 UPDATE `products` SET `stock` = `quantity` WHERE `stock` IS NULL OR `stock` = 0;
 UPDATE `products` SET `is_available` = 1 WHERE `is_available` IS NULL;
