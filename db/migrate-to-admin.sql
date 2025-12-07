@@ -178,11 +178,27 @@ CREATE TABLE IF NOT EXISTS `inventory_adjustments` (
   CONSTRAINT `inventory_adjustments_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Add telegram bot columns to users table
-ALTER TABLE `users` 
-ADD COLUMN IF NOT EXISTS `telegram_id` BIGINT DEFAULT NULL UNIQUE,
-ADD COLUMN IF NOT EXISTS `phone_number` VARCHAR(20) DEFAULT NULL,
-ADD COLUMN IF NOT EXISTS `address` TEXT DEFAULT NULL;
+-- Add telegram bot columns to users table (check if columns exist first)
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                   WHERE TABLE_SCHEMA = 'yx' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'telegram_id');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE `users` ADD COLUMN `telegram_id` BIGINT DEFAULT NULL UNIQUE', 'SELECT "Column telegram_id already exists"');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                   WHERE TABLE_SCHEMA = 'yx' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'phone_number');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE `users` ADD COLUMN `phone_number` VARCHAR(20) DEFAULT NULL', 'SELECT "Column phone_number already exists"');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                   WHERE TABLE_SCHEMA = 'yx' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'address');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE `users` ADD COLUMN `address` TEXT DEFAULT NULL', 'SELECT "Column address already exists"');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- Update existing data to have proper stock values
 UPDATE `products` SET `stock` = `quantity` WHERE `stock` IS NULL OR `stock` = 0;
